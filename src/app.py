@@ -14,7 +14,7 @@ cache = Cache(app)  # Initialize Cache
 def index():
     data = {
         "success": True,
-        "message": "Welcome to Flask Email Verifier!",
+        "message": "Welcome to Real Email Verifier!",
         "powered_by": 'https://shouts.dev/'
     }
     return jsonify(data)
@@ -27,7 +27,7 @@ def verify():
         if getFromAddress:
             fromAddress = getFromAddress
         else:
-            fromAddress = 'noreply@gmail.com'
+            fromAddress = 'noreply@shouts.dev'
 
         # Email address to verify
         addressToVerify = request.args.get('email')
