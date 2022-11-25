@@ -18,10 +18,10 @@ To use this project, start by cloning the repository:
 git clone https://github.com/mdobydullah/real-email-verify.git
 ```
 
-cd into the project, and make a copy of `.env_example` to `.env`
+cd into the project, and make a copy of `.env.example` to `.env`
 
 ```bash
-$ cp .env.example .env
+cp .env.example .env
 ```
 
 ### Build and Run
