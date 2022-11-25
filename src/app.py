@@ -1,41 +1,52 @@
-from flask import Flask, jsonify, request
+import json
+
+from flask import Flask, jsonify, request, render_template
 from flask_caching import Cache  # Import Cache from flask_caching module
 import re
 import smtplib
 import dns.resolver
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='static', template_folder='templates')
 # Set the configuration variables to the flask application
 app.config.from_object('config.Config')
 cache = Cache(app)  # Initialize Cache
 
-@app.route("/")
-@cache.cached(timeout=30, query_string=True)
+# index route
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    data = {
-        "success": True,
-        "message": "Welcome to Real Email Verifier!",
-        "powered_by": 'https://shouts.dev/'
-    }
-    return jsonify(data)
+    if request.method == 'POST':
+        toEmail = request.form['email']
 
-@app.route('/verify')
-def verify():
+        response = verifyEmail('', toEmail)
+        return render_template('index.html', data=response, email=toEmail)
+    else:
+        return render_template('index.html', email='')
+
+# api route
+@app.route('/api/verify')
+def api_verify():
+    fromEmail = request.args.get('from')
+    toEmail = request.args.get('email')
+
+    response = verifyEmail(fromEmail, toEmail)
+    return json.dumps(response)
+
+# email verify function
+def verifyEmail(fromEmail, toEmail):
     try:
         # Address used for SMTP MAIL FROM command
-        getFromAddress = request.args.get('from')
-        if getFromAddress:
-            fromAddress = getFromAddress
+        if fromEmail:
+            fromAddress = fromEmail
         else:
             fromAddress = 'noreply@shouts.dev'
 
         # Email address to verify
-        addressToVerify = request.args.get('email')
+        addressToVerify = toEmail
         if addressToVerify == None:
-            return jsonify(
-                success=False,
-                message=str('Please enter an email to verify!')
-            )
+            return {
+                "success": False,
+                "message": str('Please enter an email to verify!')
+            }
 
         # Simple Regex for syntax checking
         regex = '^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$'
@@ -43,10 +54,10 @@ def verify():
         # Syntax check
         match = re.match(regex, addressToVerify)
         if match == None:
-            return jsonify(
-                success=False,
-                message=str('Email syntax is bad!')
-            )
+            return {
+                "success": False,
+                "message": str('Email syntax is bad!!')
+            }
 
         # Get domain for DNS lookup
         splitAddress = addressToVerify.split('@')
@@ -82,21 +93,21 @@ def verify():
             emailAddressIsValid = False
 
         # Return response
-        return jsonify(
-            success=emailAddressIsValid,
-            send_from=fromAddress,
-            send_to=addressToVerify,
-            domain=domain,
-            mx_cached=mxCached,
-            mx_record=mxRecord,
-            response_code=code,
-            message=str(message),
-        )
+        return {
+            "success": emailAddressIsValid,
+            "send_from": fromAddress,
+            "send_to": addressToVerify,
+            "domain": domain,
+            "mx_cached": mxCached,
+            "mx_record": mxRecord,
+            "response_code": code,
+            "message": str(message),
+        }
     except Exception as e:
-        return jsonify(
-            success=False,
-            message=str(e)
-        )
+        return {
+            "success": False,
+            "message": str(e)
+        }
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

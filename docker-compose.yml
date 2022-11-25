@@ -1,6 +1,7 @@
 version: '3'
+
 services:
-  api:
+  app:
     container_name: flask-container
     build: .
     entrypoint: python app.py

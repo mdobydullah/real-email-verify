@@ -5,7 +5,7 @@
 
 ## Features
 
-* Syntax checks
+* Syntax checker
 * Domain verification
 * MX (Mail Exchange records) verification
 * Caching domain lookups to improve performance
@@ -38,15 +38,11 @@ Now visit the URL:
 http://localhost:5000/
 ```
 
-You'll see the output:
+You'll see an input field. After submitting an email address, it'll show response like:
 
-```json
-{
-  "success": true,
-  "message": "Welcome to Real Email Verifier!",
-  "powered_by": "https://shouts.dev/"
-}
-```
+<p align="center">
+    <img src="https://cdn.shouts.dev/media/149/rmv-index.png" alt='response'>
+</p>
 
 #### Stop Application
 
@@ -54,12 +50,12 @@ You'll see the output:
 docker-compose down -v
 ```
 
-### Usage
+### API Usage
 
 #### Verify an email:
 
 ```bash
-http://localhost:5000/verify?email=hi@obydul.me
+http://localhost:5000/api/verify?email=hi@obydul.me
 ```
 
 Response:
@@ -84,7 +80,7 @@ from=EMAIL_ADDESS
 email=EMAIL_ADDESS
 
 # example
-http://localhost:5000/verify?from=noreply@shouts.dev&email=hi@obydul.me
+http://localhost:5000/api/verify?from=noreply@shouts.dev&email=hi@obydul.me
 ```
 
 ### License
